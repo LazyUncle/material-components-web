@@ -188,13 +188,6 @@ describe('MDCSelectFoundation', () => {
        expect(mockAdapter.closeOutline).not.toHaveBeenCalled();
      });
 
-  it(`#handleMenuOpened adds ${cssClasses.ACTIVATED} class name`, () => {
-    const {foundation, mockAdapter} = setupTest();
-    foundation.handleMenuOpened();
-    expect(mockAdapter.addClass).toHaveBeenCalledWith(cssClasses.ACTIVATED);
-    expect(mockAdapter.addClass).toHaveBeenCalledTimes(1);
-  });
-
   it('#handleMenuOpened focuses last selected element', () => {
     const {foundation, mockAdapter} = setupTest();
     (foundation as any).selectedIndex = 2;
@@ -443,6 +436,13 @@ describe('MDCSelectFoundation', () => {
         .toHaveBeenCalledWith('aria-expanded', 'true');
   });
 
+  it('#handleClick adds activated class if isMenuOpen_=false', () => {
+    const {foundation, mockAdapter} = setupTest();
+    (foundation as any).isMenuOpen = false;
+    foundation.handleClick(0);
+    expect(mockAdapter.addClass).toHaveBeenCalledWith(cssClasses.ACTIVATED);
+  });
+
   it('#handleKeydown calls adapter.openMenu if valid keys are pressed, menu is not open and select is focused',
      () => {
        const {foundation, mockAdapter} = setupTest();
@@ -474,6 +474,9 @@ describe('MDCSelectFoundation', () => {
        (foundation as any).isMenuOpen = false;
        foundation.handleKeydown(event);
        expect(mockAdapter.openMenu).toHaveBeenCalledTimes(8);
+
+       checkNumTimesSpyCalledWithArgs(
+           mockAdapter.addClass, [cssClasses.ACTIVATED], 8);
        checkNumTimesSpyCalledWithArgs(
            mockAdapter.setSelectAnchorAttr, ['aria-expanded', 'true'], 8);
        expect(preventDefault).toHaveBeenCalledTimes(8);
